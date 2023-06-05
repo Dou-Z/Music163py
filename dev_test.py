@@ -1,24 +1,11 @@
-import json
-import re
-
-import pandas as pd
-
-# df = pd.read_csv('music_data/album_list.csv', header=None, names=['id', 'tag', 'url', 'z','a'])
-# print(df)
 import requests
 from bs4 import BeautifulSoup
 import js2py
-import execjs
-import jsonpath
 
 def Music_datail_Parse():
     url = 'https://music.163.com/song?id=1915894370'
-    # url = 'https://music.163.com/song?id=67857'
-    # url = 'https://music.163.com/song?id=1915894842'
+
     headers = {
-                # 'Cookie':'nts_mail_user=doucx2020@163.com:-1:1; _ntes_nuid=1c7503456cec149f273482216191cabf; _ntes_nnid=1c7503456cec149f273482216191cabf,1662520701747; WNMCID=bdunkz.1662520702045.01.0; WEVNSM=1.0.0; WM_TID=u0rj0pAqpc5BQBAAVBOFD1dj%2FzHKZ%2F1n; NMTID=00O5LW3ptaHzoXIbUKInGtQ1NMq4DYAAAGD3soVWA; NTES_P_UTID=ojIIA4uvH5XIjcq0gje2GwcgfFzHYQgc|1678181326; P_INFO=doucx2020@163.com|1678181326|1|mail163|00&99|sic&1676947341&mail163#jis&320100#10#0#0|&0||doucx2020@163.com; sDeviceId=YD-Lg7zn5EKr7VFU1QUQQORKGLTEMBNO7Qx; ntes_utid=tid._.%252BCaNPOwEETlAAxUVUUfEgQqyj%252FVt1xTZ._.0; _iuqxldmzr_=32; __snaker__id=caz9LoCQ0BJyaUuH; gdxidpyhxdE=en%2BQKWpr%5C7%5CH8w9E1T6PolGT6eCJ%2F8GGmwV%5CCaNqr1P3U%2FhUdBt4bZz37DPsYiHJP7SAPEfiz7pdeU3610fNwyXow%5Crg%2Bu5QELKzN6Gclx2avP7zAWLUPYbexIUerNb3YwTMhEZ%2F5o6e%5C%5CgRbAV6lU9MGlYcqM1%2BLG6jTIURem%2Bptqqr%3A1685627509606; YD00000558929251%3AWM_NI=qgjrmzhLs%2Fa6%2Fp2Ejvy4dEOB9hz0AqF1DkKmiIPff4nV8hPdEk77cHXiolU7zCsyQmMo5k3qGDeAgv1A%2Fa%2Btsj3qvedgRAP6B3OwOvjw6UnAriESyLqa1C%2FIxog1OsUWQ1k%3D; YD00000558929251%3AWM_NIKE=9ca17ae2e6ffcda170e2e6ee94c86ea3f0b6b7b1508d9e8ea7c15e929a8bb0d46898b1e5a4d344aef59ed9e62af0fea7c3b92ab3b9a693f072ac94bdd0e43eedb0fea6e97ebbecaca6ce4afbb8b6d1c47b86ef8c8cca67ab97a087e540ae8af889d37087b5f9d8e2449cb7a18dd83dba9dbd9ad4678fb1fb8cb27b859caba2e67ef39fe182aa80b1b6fd92f56fa8b99ea2d33e82ed8198ce7eaaa9fab6ed4bb2b78bb4fc48b3bfffa4ae43bcb1a9d2ce7997899fd2ea37e2a3; YD00000558929251%3AWM_TID=clO6tivR0apABFFFRVLUkS5qCPSj6V4x; __remember_me=true; MUSIC_U=006CD20E51F6949561BEEEBBE036583B92631982FBE00D2B36819DCBA8CDC72C92039C913606D1017A7FD4F590398BD81EDE39571605A0CD4CFA2FF1ED0BC145DD9315B2C6E30BF037A63D4C33ADFC35E191AB7EFD1AC999428BBEC4AEFF5BC1741BD9BE6702231A5C83DEA22228F3AECD4A463D0803ADFD60B21BACFFA76D3747763E33B8484ED22CA2363D6F2EC97D0849120F4C2A4A5273F337FE25E9F52EE6E0999BBAEA27D6EDF154803866C6AB2611123937140D5145AFF4501E98501DEBE7A01437DE4F2237D791BDEB87609E67180588BA386EF432C6AE830651CD9DB15E6BAD6F392EA9504EA1DDB13A9494091BE0BEA117E2E12981E99059720E616816484B3CBC4F46B8C21058CC6F962CCE68A88FAE74C43CC4478FD26A9DE4A8695D79A7954DA3669CFC3256D643B2EC7E6AFD9346FC1EB24D61A458D4D4046AC3D55B001CB8CB1B38D37D133F493DF7459EA2170A911A3C746013E3EE36B35D52; __csrf=408cf3f916a7a73b70187f1878ccd4a0; ntes_kaola_ad=1; timing_user_id=time_3cXB7uvKxo; JSESSIONID-WYYY=%2FXjZ4wCDgJx%5C9euFcv00A3%2FnD2T3tiwYyijK0VZ7mjJ2SpuFEdBMoVEE0A5iChUEENyrlYPDejDNI7Ifw9SpS6%2FFj9IKXCJ2IJao2XsJ4K%2BXJiKSpCJF%5CGAcyc3ZvJh2Y9N7D0%2B%2FdYUPJT%5CmYFpPaacV8VkeJ4FqAZcBjb7oogIF%5C838%3A1685775628218; WM_NI=RkokCQ2xfPmavu03r1i1HYEIKANUj%2FyzSaMTys5P1%2FKhFZpirO8EvbdvQZ5hNZ9%2BEnSFWwqXJ5weRIzdYAxgg2SbjW9aMug232BCrcHOkUTXSl6yxwSAfVOPSpwUWzbYVXo%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eed8d74b93a98889d372f3b48fb2c44e829f9ab1d56485aafaccf633a98cfca9ce2af0fea7c3b92a92b5a18cc25bf2a8aab1f06bb6ab00d4f13babef88bac843899f82b6e925bba69d82d060bbadfbb1b42589b88abbf363b291f8a6f56aa8aa9fbbb8648e86f7ccc866919a9998f4548aebb986d143babc97a2fb6da5ee9d83e95dfbbf8396e63af1ee8ea4f1698c91a5b6d75491b4fa9afb7d919faab7ce5c91b0b9b6d672a2879ab9ee37e2a3',
-                # 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                # 'Origin':'https://music.163.com/',
 
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
             }
@@ -72,12 +59,7 @@ def request_Post():
     print(response.content.decode())
     music_json_data = response.json()
     print(music_json_data)
-    # song_url = music_json_data['data'][0]['url']
-    # print('url：',song_url)
-    # song_time = music_json_data['data'][0]['time']
-    # print('时长：',song_time)
-    # song_type = music_json_data['data'][0]['type']
-    # print('后缀名：',song_type)
+
 
 
 if __name__ == '__main__':

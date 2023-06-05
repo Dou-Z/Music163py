@@ -2,6 +2,7 @@ import builtins
 import os
 import random
 import re
+import sys
 import time
 import uuid
 
@@ -207,10 +208,27 @@ class Music163_Spider():
         # 是否要VIP
         VIP_li = soup.select('.u-icn-98')
         if len(VIP_li) > 0:
-            Vip = True
+            vip_flag = 1
+            song_url = 'VIP歌曲'
+            song_time = 0
+            song_type = 'VIP歌曲'
+
         else:
+            vip_flag = 0
             # 获取歌曲链接及其他信息
-            music_json= self.Music_Post(music_id)
+            music_json = self.Music_Post(music_id)
+
+            song_url = music_json['data'][0]['url']
+            # print('url：', song_url)
+            song_time = music_json['data'][0]['time']
+            # print('时长：', song_time)
+            song_type = music_json['data'][0]['type']
+            # print('后缀名：', song_type)
+            # 判断是否有MV
+
+
+        mv_if = re.findall('title="播放mv" href="(.*?)"', html)
+        mv_href = '无MV'
 
 
         song_url = music_json['data'][0]['url']
@@ -243,15 +261,6 @@ class Music163_Spider():
         # 写入数据库
         ms.insert_music(self.CreateUUid(),title,playtime,autuor,0,url,title,composer,lyric,tag,cnt_comment,pic_src)
 
-    def MusucJSBlowUP(self,id):
-        # 创建js执行环境，返回一个上下文对象
-        content = js2py.EvalJs()
-        # 执行js代码
-        content.execute(open('./Music163.js', 'r', encoding='utf-8').read())
-
-        res = content.Get_encKey(id)
-        return res
-
     def Music_Post(self,music_id):
         headers = {
 
@@ -270,6 +279,55 @@ class Music163_Spider():
         # print(response.json())
         return response.json()
 
+    def Mv_Spider_post(self, ids):
+
+        mv_url = 'https://music.163.com/weapi/song/enhance/play/mv/url'
+        # ids = '5736067'
+        params_dic = self.MusucJSBlowUP(ids)
+        key_params = {
+            'params': params_dic['encText'],
+            'encSecKey': params_dic['encSecKey'],
+        }
+        response = requests.post(url=mv_url, headers=self.headers, params=key_params, verify=False)
+        print(response.status_code)
+        MV_json_data = response.json()
+
+        mv_url = MV_json_data['data']['url']
+        print('url：', mv_url)
+        return mv_url
+
+    def get_comment_cnt(self, ids):
+        comment_url = 'https://music.163.com/weapi/comment/resource/comments/get?csrf_token=b47c7b14bf8c72ada65f9ef86f77ec23'
+        params_dic = self.MusucJSBlowUP(ids)
+        key_params = {
+            'params': params_dic['encText'],
+            'encSecKey': params_dic['encSecKey'],
+        }
+
+        response = requests.post(url=comment_url, headers=self.headers, params=key_params, verify=False)
+        # print(response.status_code)
+        comment_json_data = response.json()
+        totalCount = comment_json_data['data']['totalCount']
+        print('totalCount：', totalCount)
+        return totalCount
+
+    def MusucJSBlowUP(self, id):
+        # 创建js执行环境，返回一个上下文对象
+        content = js2py.EvalJs()
+        # 执行js代码
+        content.execute(open('./Music163.js', 'r', encoding='utf-8').read())
+        funcName = sys._getframe().f_back.f_code.co_name
+        if funcName == 'Music_Post':
+            # 获取歌曲的encSecKey
+            res = content.Get_encKey(id)
+        elif funcName == 'Mv_Spider_post':
+            # 获取MV的encSecKey
+            res = content.Get_mv_encKey(id)
+        elif funcName == 'get_comment_cnt':
+            # 获取comment的encSecKey
+            res = content.Get_comment_encKey(id)
+        return res
+
     def del_csv(self):
         try:
             os.remove('./music_data/music_detail.csv')
@@ -277,6 +335,8 @@ class Music163_Spider():
             os.remove('./music_data/album_list.csv')
         except Exception as e:
             print(e)
+
+
 
 class MusicToSql(Music163_Spider):
     def __init__(self):

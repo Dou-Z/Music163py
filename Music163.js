@@ -1170,9 +1170,16 @@ function Get_encKey(id) {
     console.log(d)
     return get_d(d,e,f,g)
 }
-var mv = '{"id":"186025","csrf_token":"808875af829766a4f2826d221ee3d74a"}'
+
+
 function Get_mv_encKey(id) {
-    var d = '{"id":"'+id+'","csrf_token":"808875af829766a4f2826d221ee3d74a"}'
-    // console.log(d)
-    return get_d(mv,e,f,g)
+    var d = '{"id":"'+id+'","r":"480","csrf_token":"808875af829766a4f2826d221ee3d74a"}'
+
+    return get_d(d,e,f,g)
+}
+
+function Get_comment_encKey(id) {
+    var d = '{"rid":"R_SO_4_' + id + '","threadId":"R_SO_4_' + id + '","pageNo":"1","pageSize":"20","cursor":"-1","offset":"0","orderType":"1","csrf_token":"b47c7b14bf8c72ada65f9ef86f77ec23"}'
+
+    return get_d(d, e, f, g)
 }
