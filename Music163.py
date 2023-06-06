@@ -245,8 +245,8 @@ class Music163_Spider():
 
         composer = title
 
-        # 评论量 cnt_comment_count
-        cnt_comment = soup.select('#cnt_comment_count')[0].get_text()
+       # 评论量 cnt_comment_count
+        cnt_comment = self.get_comment_cnt(music_id)
 
 
         # 输出歌单详情页信息
@@ -256,11 +256,10 @@ class Music163_Spider():
         playtime = 0
 
         with open('./music_data/music_detail.csv', 'a+', encoding='utf-8-sig') as f:
-            f.write(title + ',' + str(playtime) + ',' + autuor + ',' + '' + ',' + url + ',' + title + ',' + composer +',' + lyric + ',' + tag + ',' + cnt_comment + ',' + pic_src + '\n')
-        cnt_comment = random.randint(100,5000)
-        # 写入数据库
-        ms.insert_music(self.CreateUUid(),title,playtime,autuor,0,url,title,composer,lyric,tag,cnt_comment,pic_src)
+            f.write(title + ',' + str(song_time) + ',' + autuor + ',' + mv_href + ',' + song_url + ','+song_type+',' + title + ',' + composer + ',' + tag + ',' + cnt_comment + ',' + pic_src + '\n')
 
+        # 写入数据库
+        ms.insert_music(self.CreateUUid(),title,song_time,autuor,vip_flag,song_url,mv_href,composer,song_type,tag,cnt_comment,pic_src)
     def Music_Post(self,music_id):
         headers = {
 
