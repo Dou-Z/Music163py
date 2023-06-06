@@ -59,7 +59,29 @@ def request_Post():
     print(response.content.decode())
     music_json_data = response.json()
     print(music_json_data)
+def Music_playlist_Parse():
+    # url = 'https://music.163.com/song?id=28059417'
+    url = 'https://music.163.com/song?id=67857'
+    # url = 'https://music.163.com/song?id=1915894842'
+    play_url = 'https://music.163.com/discover/playlist'
+    headers = {
 
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+            }
+    try:
+        response = requests.get(url=play_url, headers=headers, verify=False)
+        print(response.status_code)
+    except Exception as e:
+        # print(response.status_code)
+        print('ERROR:', e)
+    html = response.text
+
+    soup = BeautifulSoup(html, 'html.parser')
+    # print(html)
+    play_list = soup.select('.bd a')[2:]
+
+    print(len(play_list))
+    print(play_list)
 
 
 if __name__ == '__main__':
