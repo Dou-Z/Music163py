@@ -27,16 +27,17 @@ CREATE TABLE `album` (
 
 --  音乐表
 
+
 CREATE TABLE `music` (
   `id` varchar(255) NOT NULL COMMENT 'id',
   `title` varchar(255) NOT NULL COMMENT '标题',
   `playtime` int NOT NULL COMMENT '时长 bMusic',
   `singer` varchar(255) NOT NULL COMMENT '歌手',
-  `playvolume` int DEFAULT NULL COMMENT '播放量',
+  `Vip` int DEFAULT NULL COMMENT '是否为VIP歌曲（0：No，1：Yes）',
   `audiorul` varchar(255) NOT NULL COMMENT '音频地址',
-  `name` varchar(255) NOT NULL COMMENT '歌曲名称',
+  `mv` varchar(255) NOT NULL COMMENT 'mv地址',
   `composer` varchar(255) DEFAULT NULL COMMENT '作曲者',
-  `lyrics` longtext NOT NULL COMMENT '歌词',
+  `song_type` varchar(255) NOT NULL COMMENT '歌曲类型',
   `tagid` varchar(255) NOT NULL COMMENT '标签id',
   `commentvolume` int DEFAULT NULL COMMENT '评论量',
   `plot` varchar(255) DEFAULT NULL COMMENT '图像',
