@@ -199,8 +199,8 @@ class Music163_Spider():
 
     def get_data_of_music_detail(self, tag, title, music_id):
 
-        print(f"\r正在获取 = {music_id} = 歌曲详情页的信息...", end='', flush=True)
-        url = 'https://music.163.com/#/song?id=' + music_id
+        url = 'https://music.163.com/song?id=' + music_id
+        print(f"\r正在获取  {url}  歌曲详情页的信息...", end='', flush=True)
         try:
             response = requests.get(url=url, headers=self.headers, verify=False)
         except Exception as e:
@@ -216,15 +216,13 @@ class Music163_Spider():
         # 歌手
         aut_li = soup.select('.des span')
         if len(aut_li) > 0:
-
             autuor = soup.select('.s-fc4 span')[0]['title']
         else:
             autuor = ""
 
         # 是否要VIP
         VIP_li = soup.select('.u-icn-98')
-        print("\nVIP:",VIP_li)
-        if len(VIP_li) >= 0:
+        if len(VIP_li) > 0:
             vip_flag = 1
             song_url = 'VIP歌曲'
             song_time = 0
@@ -235,20 +233,16 @@ class Music163_Spider():
             music_json= self.Music_Post(music_id)
 
             song_url = music_json['data'][0]['url']
-            print('url：', song_url)
+            # print('url：', song_url)
+
             song_time = music_json['data'][0]['time']
-            print('时长：', song_time)
+            # print('时长：', song_time)
             song_type = music_json['data'][0]['type']
-            print('后缀名：', song_type)
-            # 判断是否有MV
-
-        mv_if = re.findall('title="播放mv" href="(.*?)"', html)
-        mv_href = '无MV'
-        if len(mv_if) > 0:
-            # 有MV，获取MVid
-            mv_id = mv_if[0].split('=')[1]
-            mv_href = self.Mv_Spider_post(mv_id)
-
+            # print('后缀名：', song_type)
+            if song_url== None:
+                song_url = '无版权'
+                song_time = 0
+                song_type = '无版权'
 
         composer = title
 
