@@ -19,10 +19,10 @@ class Music163_Spider():
     def __init__(self):
         self.connection = pymysql.connect(host='localhost',
                                      user='root',
-                                     # password='123.com',
-                                     password='123456',
-                                     # db='spider_datas',
-                                     db='py_datas',
+                                     password='123.com',
+                                     # password='123456',
+                                     db='spider_datas',
+                                     # db='py_datas',
                                      charset='utf8mb4',
                                      cursorclass=pymysql.cursors.DictCursor)
 
@@ -245,6 +245,12 @@ class Music163_Spider():
                 song_type = '无版权'
 
         composer = title
+        mv_if = re.findall('title="播放mv" href="(.*?)"', html)
+        mv_href = '无MV'
+        if len(mv_if) > 0:
+            # 有MV，获取MVid
+            mv_id = mv_if[0].split('=')[1]
+            mv_href = self.Mv_Spider_post(mv_id)
 
         # 评论量 cnt_comment_count
         cnt_comment = self.get_comment_cnt(music_id)
